@@ -4,38 +4,59 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-data = read.csv("TS3_Raw_tree_data.csv")
-data
-```
-
 ```{r}
 library(tidyverse)
 library(ggthemes)
 library(tidycensus)
 library(sf)
 ```
-```{r}
 
+```{r}
+data = read.csv("TS3_Raw_tree_data.csv")
+data
+```
+
+Question 1: Sample sizes by state
+
+```{r}
 data <- data %>%
   mutate(City_Name = str_extract(City, "^[^,]+")) |>
   mutate(State = str_extract(City,"[A-Z]{2}$"))
-data
-```
-```{r}
+
 Records_by_state <- data |>
   count(State, name = "Records")
+Records_by_state
 ```
+
+Question 2: Cities in NC/SC
 
 ```{r}
 filtered_data <- data |>
   filter(State == "NC" | State == "SC")
+
+cities_in_SC_NC <- filtered_data |>
+  pull(City_Name) |>
+  unique()
+print(cities_in_SC_NC)
 ```
+
+They collected data from Charleston and Charlotte.
+
+Question 3: Genera and species
+
+```{r}
+filtered_data <- filtered_data |>
+  mutate(Genus = str_extract(ScientificName, "^[^\\s]+"))
+```
+
+```{r}
+genus_avg_crown <- filtered_data |>
+  group_by(Genus) |>
+  summarize(Genus_Average_Diameter = mean(AvgCdia..m., na.rm = T)) |>
+  arrange(desc(Genus_Average_Diameter))
+print(genus_avg_crown)
+```
+
+The genus of trees that has the largest crown diameter in North and South Carolina is Quercus with an average diameter of 13.623163.
+
+Github link: https://github.com/annaschmedes/hw_5.git
