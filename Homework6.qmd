@@ -1,0 +1,41 @@
+---
+title: "Homework 5"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+data = read.csv("TS3_Raw_tree_data.csv")
+data
+```
+
+```{r}
+library(tidyverse)
+library(ggthemes)
+library(tidycensus)
+library(sf)
+```
+```{r}
+
+data <- data %>%
+  mutate(City_Name = str_extract(City, "^[^,]+")) |>
+  mutate(State = str_extract(City,"[A-Z]{2}$"))
+data
+```
+```{r}
+Records_by_state <- data |>
+  count(State, name = "Records")
+```
+
+```{r}
+filtered_data <- data |>
+  filter(State == "NC" | State == "SC")
+```
